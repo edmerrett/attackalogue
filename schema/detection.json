@@ -7,7 +7,10 @@
     	"sub-technique": "str"
     },
     "detection": {
-    	"platform": "str",
+    	"platform": [
+            "str1", 
+            "str2"
+        ],
     	"lang": "str",
     	"rule": "str"
     }
