@@ -1,0 +1,14 @@
+{
+    "id": 0,
+    "mitre_data": {
+    	"mitre_id": "str",
+    	"tactic": "str",
+    	"technique": "str",
+    	"sub-technique": "str"
+    },
+    "detection": {
+    	"platform": "str",
+    	"lang": "str",
+    	"rule": "str"
+    }
+}
