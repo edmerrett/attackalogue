@@ -1,52 +1,21 @@
+from crypt import methods
 from flask import Flask, request, jsonify, make_response
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from werkzeug.security import generate_password_hash, check_password_hash
+from passlib.hash import pbkdf2_sha256
 import uuid
 import jwt
 import datetime
 from functools import wraps
 
+import pymongo
+
+
+# Flask App
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://merrette:pinch-wipe-pizza@api.merretech.io:3306/attack-sql"
 app.config['SECRET_KEY'] = "C19PO-uzKGkiqX81Rs7VP3_epptOfuRj839SKZ7Lej-hQsa6"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-
-
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(50))
-    name = db.Column(db.String(50))
-    password = db.Column(db.String(150))
-    admin = db.Column(db.Boolean)
-
-
-class Detections(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    tactic = db.Column(db.String(100))
-    technique = db.Column(db.String(100))
-    sub_technique = db.Column(db.String(100))
-    mitre_id = db.Column(db.String(10))
-
-    def __init__(self, tactic, technique, sub_technique, mitre_id):
-        self.tactic = tactic
-        self.technique = technique
-        self.sub_technique = sub_technique
-        self.mitre_id = mitre_id
-
-
-class DetectionsSchema(ma.Schema):
-    class Meta:
-        fields = ("id", "tactic", "technique", "sub_technique", "mitre_id")
-        model = Detections
-
-
-detection_schema = DetectionsSchema()
-detections_schema = DetectionsSchema(many=True)
-
+# Database
+client = pymongo.MongoClient('localhost', 27017)
+db = client.users
 
 def token_required(f):
     @wraps(f)
@@ -56,10 +25,10 @@ def token_required(f):
             token = request.headers['x-access-tokens']
 
         if not token:
-            return jsonify({'message': 'a valid token is missing'}), 400
+            return jsonify({'message': 'a valid token is missing'}), 403
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Users.query.filter_by(public_id=data['public_id']).first()
+            current_user = db.users.find_one({"_id": data["public_id"]})
         except:
             return jsonify({'message': 'token is invalid'}), 401
 
@@ -68,53 +37,44 @@ def token_required(f):
     return decorator
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST'])
 def signup_user():
-    user = request.json['name']
+
+    name = request.json['name']
+    username = request.json['username']
     password = request.json['password']
 
-    hashed_password = generate_password_hash(password, method='sha256')
+    hashed_password = pbkdf2_sha256.encrypt(password)
+    user = {
+        "_id": uuid.uuid4().hex,
+        "name": name,
+        "username": username,
+        "password": hashed_password
+    }
 
-    new_user = Users(public_id=str(uuid.uuid4()), name=user, password=hashed_password, admin=False)
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'message': 'registered successfully'})
+    if db.users.find_one({"username": username}):
+        return jsonify({'error': 'user already exists'}), 400
+ 
+    if db.users.insert_one(user):
+        return jsonify({'message': 'registered successfully'}), 200
 
 
 @app.route('/login', methods=['POST'])
 def login_user():
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
-        return make_response('could not verify', 401, {'Authentication': 'login required"'})
+        return make_response('could not verify', 401, {'Authentication': 'login required'})
 
-    user = Users.query.filter_by(name=auth.username).first()
-    if check_password_hash(user.password, auth.password):
+    user = db.users.find_one({"username": auth.username})
+
+    if pbkdf2_sha256.verify(auth.password, user['password']):
         token = jwt.encode(
-            {'public_id': user.public_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+            {'public_id': user["_id"], 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
             app.config['SECRET_KEY'], "HS256")
 
         return jsonify({'token': token}), 202
 
-    return make_response('could not verify', 401, {'Authentication': '"login required"'})
-
-
-@app.route('/users', methods=['GET'])
-def get_all_users():
-    users = Users.query.all()
-
-    result = []
-
-    for user in users:
-        user_data = {}
-        user_data['public_id'] = user.public_id
-        user_data['name'] = user.name
-        user_data['password'] = user.password
-        user_data['admin'] = user.admin
-
-        result.append(user_data)
-
-    return jsonify({'users': result})
+    return make_response('could not verify', 401, {'Authentication': 'login required'})
 
 
 @app.route('/')
@@ -122,49 +82,55 @@ def index():
     return jsonify({'message': 'see API documentation'})
 
 
-@app.route('/attacks')
+@app.route('/users', methods=['GET'])
+@token_required
+def get_all_users(current_user): 
+    collection = db['users']
+    results = []
+
+    for user in collection.find():
+        results.append(user)
+
+    return jsonify({'users': results})
+
+
+@app.route('/attacks', methods=['GET'])
 @token_required
 def get(current_user):
-    data = Detections.query.all()
-    return jsonify({
-        'detections': detections_schema.dump(data)
-    }), 200
+
+    collection = db['detections']
+    results = []
+
+    for detection in collection.find():
+        results.append(detection)
+
+    return jsonify({'detections': results})
 
 
-@app.route('/attacks/id/<id>')
+
+@app.route('/attacks/id/<id>', methods=['GET'])
 @token_required
 def get_id(current_user, id):
-    data = Detections.query.filter(Detections.id == id)
-    return jsonify({
-        'detections': detections_schema.dump(data)
-    })
 
+    results = []
+    collection = db['detections']
+    mitre_id = collection.find({"mitre_data.mitre_id": id})
 
-@app.route('/attacks/mitre-id/<mitre_id>')
-@token_required
-def get_mitre(current_user, mitre_id):
-    data = Detections.query.filter(Detections.mitre_id.like(f"%{mitre_id}%"))
-    return jsonify({
-        'detections': detections_schema.dump(data)
-    })
+    if mitre_id is None:
+        return jsonify({"message": "no detections found for the provided id"})
+
+    for rule in mitre_id:
+        if id == rule["mitre_data"]["mitre_id"]:
+            results.append(rule)
+            return jsonify({'detections': results})
 
 
 @app.route('/attacks/create', methods=['POST'])
 @token_required
 def add_detection(current_user):
-    tactic = request.json['tactic']
-    technique = request.json['technique']
-    sub_technique = request.json['sub_technique']
-    mitre_id = request.json['mitre_id']
-
-    if not any([tactic, technique, sub_technique, mitre_id]):
-        return jsonify({'message': 'bad request'}), 400
-
-    detection = Detections(tactic, technique, sub_technique, mitre_id)
-    db.session.add(detection)
-    db.session.commit()
-
-    return detection_schema.jsonify(detection), 201
+    return jsonify({
+        'message': "this endpoint is yet to be created"
+    })
 
 
 if __name__ == '__main__':
