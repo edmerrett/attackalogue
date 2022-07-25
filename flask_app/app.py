@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import Flask, request, jsonify, make_response
 from passlib.hash import pbkdf2_sha256
 import uuid
@@ -128,6 +127,22 @@ def get_id(current_user, id):
 @app.route('/attacks/create', methods=['POST'])
 @token_required
 def add_detection(current_user):
+    return jsonify({
+        'message': "this endpoint is yet to be created"
+    })
+
+
+@app.route('/attacks/delete', methods=['DELETE'])
+@token_required
+def delete_detection(current_user):
+    return jsonify({
+        'message': "this endpoint is yet to be created"
+    })
+
+
+@app.route('/attacks/update', methods=['PUT'])
+@token_required
+def update_detection(current_user):
     return jsonify({
         'message': "this endpoint is yet to be created"
     })
