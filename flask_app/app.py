@@ -120,13 +120,13 @@ def get_id(current_user, id):
 
     results = []
     collection = db['detections']
-    mitre_id = collection.find({"mitre_data.mitre_id": id})
+    mitre_id = collection.find({"mitre_data.mitre_id": {'$regex': id}})
 
     if mitre_id is None:
         return jsonify({"message": "no detections found for the provided id"})
 
     for rule in mitre_id:
-        if id == rule["mitre_data"]["mitre_id"]:
+        if id in rule["mitre_data"]["mitre_id"]:
             results.append(rule)
             return jsonify({'detections': results})
 
