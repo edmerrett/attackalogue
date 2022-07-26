@@ -1,16 +1,22 @@
+import uuid
+import datetime
+import os
+import pymongo
+import jwt
+
 from flask import Flask, request, jsonify, make_response
 from passlib.hash import pbkdf2_sha256
-import uuid
-import jwt
-import datetime
+from dotenv import load_dotenv
 from functools import wraps
 
-import pymongo
 
+
+# Development Tools
+load_dotenv("/Users/edmerrett/Documents/GitHub/attack-api/.env/.env")
 
 # Flask App
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "C19PO-uzKGkiqX81Rs7VP3_epptOfuRj839SKZ7Lej-hQsa6"
+app.config['SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 # Database
 client = pymongo.MongoClient('localhost', 27017)
@@ -25,6 +31,7 @@ def token_required(f):
 
         if not token:
             return jsonify({'message': 'a valid token is missing'}), 403
+        
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = db.users.find_one({"_id": data["public_id"]})
