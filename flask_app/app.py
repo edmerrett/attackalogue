@@ -142,9 +142,26 @@ def get_id(current_user, id):
 @app.route('/attacks/create', methods=['POST'])
 @token_required
 def add_detection(current_user):
-    return jsonify({
-        'message': "this endpoint is yet to be created"
-    })
+
+    collection = db['detections']
+
+    new_detection = request.json
+    new_detection["_id"] = uuid.uuid4().hex
+
+    new_rule = new_detection["detection"]["rule"]
+    current_rule = collection.find_one({"detection.rule": new_rule})
+
+    if new_rule == current_rule["detection"]["rule"]:
+        return jsonify({
+            "error": {
+                "message": "detection already exists, see _id",
+                "_id": current_rule["_id"]
+            }
+            }), 400
+
+    collection.insert_one(new_detection)
+
+    return jsonify({'created': new_detection}), 200
 
 
 @app.route('/attacks/delete', methods=['DELETE'])
