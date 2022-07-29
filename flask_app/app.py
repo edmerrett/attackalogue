@@ -1,6 +1,7 @@
 import uuid
 import datetime
 import os
+import re
 import pymongo
 import jwt
 
@@ -12,7 +13,6 @@ from functools import wraps
 
 
 # Development Tools
-# load_dotenv("/Users/edmerrett/Documents/GitHub/attack-api/.env/.env")
 load_dotenv()
 
 # Flask App
@@ -118,6 +118,11 @@ def get(current_user):
 @app.route('/attacks/id/<id>', methods=['GET'])
 @token_required
 def get_id(current_user, id):
+
+    # input validation
+    regex_exp = re.compile(r'^(MA|TA|T|M|G|S)\d{4}(.\d{3})?$')
+    if not regex_exp.search(id):
+        return jsonify({"error": "input value for id is not valid"}), 400
 
     results = []
     collection = db['detections']
