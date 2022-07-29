@@ -12,7 +12,8 @@ from functools import wraps
 
 
 # Development Tools
-load_dotenv("/Users/edmerrett/Documents/GitHub/attack-api/.env/.env")
+# load_dotenv("/Users/edmerrett/Documents/GitHub/attack-api/.env/.env")
+load_dotenv()
 
 # Flask App
 app = Flask(__name__)
@@ -122,7 +123,9 @@ def get_id(current_user, id):
     collection = db['detections']
     mitre_id = collection.find({"mitre_data.mitre_id": {'$regex': id}})
 
-    if mitre_id is None:
+    try:
+        mitre_id[0]
+    except IndexError:
         return jsonify({"message": "no detections found for the provided id"})
 
     for rule in mitre_id:
