@@ -119,7 +119,7 @@ def get(current_user):
 @token_required
 def get_id(current_user, id):
 
-    # input validation
+    # input validation - check if id matches ATT&CK ID schema
     regex_exp = re.compile(r'^(MA|TA|T|M|G|S)\d{4}(.\d{3})?$')
     if not regex_exp.search(id):
         return jsonify({"error": "input value for id is not valid"}), 400
@@ -157,7 +157,7 @@ def add_detection(current_user):
                 "message": "detection already exists, see _id",
                 "_id": current_rule["_id"]
             }
-            }), 400
+            }), 409
 
     collection.insert_one(new_detection)
 
