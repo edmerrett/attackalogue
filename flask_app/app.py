@@ -6,6 +6,8 @@ import pymongo
 import jwt
 
 from flask import Flask, request, jsonify, make_response
+from flask_expects_json import expects_json
+from jsonschema import ValidationError
 from passlib.hash import pbkdf2_sha256
 from dotenv import load_dotenv
 from functools import wraps
@@ -22,6 +24,39 @@ app.config['SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 # Database
 client = pymongo.MongoClient('localhost', 27017)
 db = client.users
+schema = {
+    "type": "object",
+    "properties": {
+        "mitre_data": {
+            "type": "object",
+            "properties": {
+                "mitre_id": {"type": "string"},
+                "tactic": {"type": "string"},
+                "technique": {"type": "string"},
+                "sub_technique": {"type": "string"}
+            },
+            "required": ["mitre_id", "tactic"]
+        },
+        "detection": {
+            "type": "object",
+            "properties": {
+                "platform": {"type": "string"},
+                "lang": {"type": "string"},
+                "rule": {"type": "string"}
+            },
+            "required": ["rule"]
+        }
+    },
+    "required": ["mitre_data", "detection"]
+}
+
+@app.errorhandler(400)
+def bad_request(error):
+    if isinstance(error.description, ValidationError):
+        original_error = error.description
+        return make_response(jsonify({'error': original_error.message}), 400)
+    # handle other "Bad Request"-errors
+    return error
 
 def token_required(f):
     @wraps(f)
@@ -141,6 +176,7 @@ def get_id(current_user, id):
 
 @app.route('/attacks/create', methods=['POST'])
 @token_required
+@expects_json(schema)
 def add_detection(current_user):
 
     collection = db['detections']
@@ -149,17 +185,17 @@ def add_detection(current_user):
     new_detection["_id"] = uuid.uuid4().hex
 
     new_rule = new_detection["detection"]["rule"]
-    current_rule = collection.find_one({"detection.rule": new_rule})
-
-    if new_rule == current_rule["detection"]["rule"]:
-        return jsonify({
-            "error": {
-                "message": "detection already exists, see _id",
-                "_id": current_rule["_id"]
-            }
-            }), 409
-
-    collection.insert_one(new_detection)
+    try:
+        current_rule = collection.find_one({"detection.rule": new_rule})
+        if new_rule == current_rule["detection"]["rule"]:
+            return jsonify({
+                "error": {
+                    "message": "detection already exists, see _id",
+                    "_id": current_rule["_id"]
+                }
+                }), 409
+    except TypeError:
+        collection.insert_one(new_detection)
 
     return jsonify({'created': new_detection}), 200
 
