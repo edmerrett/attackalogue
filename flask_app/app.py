@@ -27,6 +27,7 @@ db = client.users
 schema = {
     "type": "object",
     "properties": {
+        "_id": {"type": "string"},
         "mitre_data": {
             "type": "object",
             "properties": {
@@ -180,7 +181,6 @@ def get_id(current_user, id):
 def add_detection(current_user):
 
     collection = db['detections']
-
     new_detection = request.json
     new_detection["_id"] = uuid.uuid4().hex
 
@@ -197,15 +197,30 @@ def add_detection(current_user):
     except TypeError:
         collection.insert_one(new_detection)
 
-    return jsonify({'created': new_detection}), 200
+    return jsonify({'created': new_detection}), 201
 
 
 @app.route('/attacks/delete', methods=['DELETE'])
 @token_required
 def delete_detection(current_user):
+
+    collection = db['detections']
+    delete_rule = request.json
+    delete = collection.delete_one({"_id": delete_rule["id"]})
+
+    if not delete.acknowledged or not delete.deleted_count == 1:
+        return jsonify({
+            "error": {
+                "acknowledged": delete.acknowledged, 
+                "deletedCount": delete.deleted_count
+                }
+                }), 400
+
     return jsonify({
-        'message': "this endpoint is yet to be created"
-    })
+        'message': "deleted",
+        "acknowledged": delete.acknowledged,
+        "deletedCount": delete.deleted_count
+        }), 200
 
 
 @app.route('/attacks/update', methods=['PUT'])
