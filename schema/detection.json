@@ -1,17 +1,47 @@
 {
-    "id": 0,
-    "mitre_data": {
-    	"mitre_id": "str",
-    	"tactic": "str",
-    	"technique": "str",
-    	"sub-technique": "str"
+    "type": "object",
+    "properties": {
+        "mitre_data": {
+            "type": "object",
+            "properties": {
+                "mitre_id": {
+                    "type": "string"
+                },
+                "tactic": {
+                    "type": "string"
+                },
+                "technique": {
+                    "type": "string"
+                },
+                "sub_technique": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "mitre_id",
+                "tactic"
+            ]
+        },
+        "detection": {
+            "type": "object",
+            "properties": {
+                "platform": {
+                    "type": "string"
+                },
+                "lang": {
+                    "type": "string"
+                },
+                "rule": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "rule"
+            ]
+        }
     },
-    "detection": {
-    	"platform": [
-            "str1", 
-            "str2"
-        ],
-    	"lang": "str",
-    	"rule": "str"
-    }
+    "required": [
+        "mitre_data",
+        "detection"
+    ]
 }
