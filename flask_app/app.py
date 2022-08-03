@@ -243,6 +243,7 @@ def update_detection(current_user):
 
     len_update = len(req_update)
     update_count = 0
+
     for field in req_update:
         key_list = list(dict.items(field))
         key = key_list[0][0]
@@ -252,18 +253,16 @@ def update_detection(current_user):
         if result.modified_count == 1:
             update_count += 1
 
-    if len_update == update_count:
+    if not len_update == update_count:
         return jsonify({
-            'message': "updated", 
-            "ack": result.acknowledged, 
-            "updated_fields": update_count
-        })
+            'message': "some properties failed to update"
+        }), 400    
 
     return jsonify({
-        'message': "updated", 
-        "ack": result.acknowledged, 
-        "updated_fields": result.modified_count
-        })
+        'message': "update successful",
+            "ack": result.acknowledged,
+            "updated_fields": update_count
+        }), 204
 
 
 if __name__ == '__main__':
