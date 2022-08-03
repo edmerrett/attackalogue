@@ -185,8 +185,8 @@ def add_detection(current_user):
     new_detection["_id"] = uuid.uuid4().hex
 
     new_rule = new_detection["detection"]["rule"]
-    try:
-        current_rule = collection.find_one({"detection.rule": new_rule})
+    current_rule = collection.find_one({"detection.rule": new_rule})
+    if current_rule:
         if new_rule == current_rule["detection"]["rule"]:
             return jsonify({
                 "error": {
@@ -194,8 +194,8 @@ def add_detection(current_user):
                     "_id": current_rule["_id"]
                 }
                 }), 409
-    except TypeError:
-        collection.insert_one(new_detection)
+
+    collection.insert_one(new_detection)
 
     return jsonify({'created': new_detection}), 201
 
@@ -206,12 +206,20 @@ def delete_detection(current_user):
 
     collection = db['detections']
     delete_rule = request.json
-    delete = collection.delete_one({"_id": delete_rule["id"]})
+
+    try:
+        delete = collection.delete_one({"_id": delete_rule["id"]})
+    except KeyError:
+        return jsonify({"error": "you must supply a valid id"}), 400
+
+    if not request.json["id"]:
+        return jsonify({"error": "you must supply a valid id"}), 400
 
     if not delete.acknowledged or not delete.deleted_count == 1:
         return jsonify({
+            "message": "no detection found for provided id",
             "error": {
-                "acknowledged": delete.acknowledged, 
+                "acknowledged": delete.acknowledged,
                 "deletedCount": delete.deleted_count
                 }
                 }), 400
@@ -226,9 +234,34 @@ def delete_detection(current_user):
 @app.route('/attacks/update', methods=['PUT'])
 @token_required
 def update_detection(current_user):
+
+    collection = db['detections']
+    req_update = request.json['update_fields']
+    mongo_filter = {"_id": request.json["id"]}
+
+    len_update = len(req_update)
+    update_count = 0
+    for field in req_update:
+        key_list = list(dict.items(field))
+        key = key_list[0][0]
+        value = key_list[0][1]
+
+        result = collection.update_one(mongo_filter, {"$set": {"detection."+key: value}})
+        if result.modified_count == 1:
+            update_count += 1
+
+    if len_update == update_count:
+        return jsonify({
+            'message': "updated", 
+            "ack": result.acknowledged, 
+            "updated_fields": update_count
+        })
+        
     return jsonify({
-        'message': "this endpoint is yet to be created"
-    })
+        'message': "updated", 
+        "ack": result.acknowledged, 
+        "updated_fields": result.modified_count
+        })
 
 
 if __name__ == '__main__':
