@@ -36,7 +36,8 @@ schema = {
                 "technique": {"type": "string"},
                 "sub_technique": {"type": "string"}
             },
-            "required": ["mitre_id", "tactic"]
+            "required": ["mitre_id", "tactic"],
+            "additionalProperties": False
         },
         "detection": {
             "type": "object",
@@ -45,7 +46,8 @@ schema = {
                 "lang": {"type": "string"},
                 "rule": {"type": "string"}
             },
-            "required": ["rule"]
+            "required": ["rule"],
+            "additionalProperties": False
         }
     },
     "required": ["mitre_data", "detection"]
@@ -256,7 +258,7 @@ def update_detection(current_user):
             "ack": result.acknowledged, 
             "updated_fields": update_count
         })
-        
+
     return jsonify({
         'message': "updated", 
         "ack": result.acknowledged, 
