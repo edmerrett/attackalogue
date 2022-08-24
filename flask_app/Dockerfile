@@ -1,4 +1,4 @@
-FROM python:3.10-rc-slim
+FROM python:3.11-rc-slim
 
 WORKDIR C:\Users\edwar\Documents\attack-api\flask_app
 COPY requirements.txt .
