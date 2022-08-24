@@ -10,4 +10,4 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: -d ./flask_app
+          args: -d --file=flask_app/requirements.txt
