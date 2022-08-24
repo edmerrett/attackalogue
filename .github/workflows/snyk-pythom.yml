@@ -1,0 +1,27 @@
+name: Test dependencies for security issues with Snyk
+on: push
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  dependencies-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: snyk/actions/setup@master
+      - name: Install Python dependencies with Pip
+        working-directory: ./flask_app
+        run: pip3 install -r requirements.txt
+      - name: Test dependencies with Snyk
+        run: snyk test
+        env:
+          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
+      - name: Monitor dependencies for security issues with Snyk
+        working-directory: ./flask_app
+        run: snyk monitor
+        env:
+          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
