@@ -1,5 +1,4 @@
-## Test
-name: Test dependencies for security issues with Snyk
+name: Snyk
 on: push
 
 env:
