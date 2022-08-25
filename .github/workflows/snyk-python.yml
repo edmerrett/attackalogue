@@ -1,4 +1,4 @@
-name: Snyk
+name: snyk
 on: push
 
 env:
@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - uses: snyk/actions/setup@master
       - name: Install Python dependencies with Pip
         working-directory: ./flask_app
@@ -19,14 +19,18 @@ jobs:
       - name: Test dependencies with Snyk
         working-directory: ./flask_app
         run: |
-          pwd
           snyk test
+        env:
+          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
+      - name: Test code with Snyk
+        working-directory: ./flask_app
+        run: |
+          snyk code test
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
       - name: Monitor dependencies for security issues with Snyk
         working-directory: ./flask_app
         run: |
-          pwd
           snyk monitor
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
