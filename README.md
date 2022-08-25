@@ -1,6 +1,6 @@
 # ATT&CKALOGUE
 
-![enter image description here](https://img.shields.io/badge/state-development-yellow) ![enter image description here](https://img.shields.io/badge/email-emerrett@hackableyou.com-blue) ![enter image description here](https://img.shields.io/github/followers/edmerrett?style=social)
+![current project state](https://img.shields.io/badge/state-development-yellow) ![contact me](https://img.shields.io/badge/email-emerrett@hackableyou.com-blue) ![github followers](https://img.shields.io/github/followers/edmerrett?style=social) [![snyk](https://github.com/edmerrett/attackalogue/actions/workflows/snyk-python.yml/badge.svg)](https://github.com/edmerrett/attackalogue/actions/workflows/snyk-python.yml)
 
 ## Introduction
 
