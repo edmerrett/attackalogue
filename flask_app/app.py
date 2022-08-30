@@ -135,6 +135,7 @@ def get_all_users(current_user):
     results = []
 
     for user in collection.find():
+        del user['password']
         results.append(user)
 
     return jsonify({'users': results})
