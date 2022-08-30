@@ -1,0 +1,14 @@
+{
+	"id": "e551bb758a2b47fbaf3924ecb9e6e6d6",
+	"mitre_data": {
+		"mitre_id": "T1595.003",
+		"tactic": "Reconnaissance",
+		"technique": "Active Scanning",
+		"sub_technique": "Wordlist Scanning"
+	},
+	"detection": {
+		"platform": "Chronicle",
+		"lang": "YARA-L",
+		"rule": "IHJ1bGUgaHVudF9nY3Bfdm1DcmVhdGlvbiB7XHJcbiAgbWV0YTpcclxuICAgICAgYXV0aG9yID0gXCJtYXR0LndhdGtpbnNAZnJlZXRyYWRlLmlvXCJcclxuICAgICAgZGVzY3JpcHRpb24gPSBcIlZNIENyZWF0aW9uXCJcclxuICAgICAgc2V2ZXJpdHkgPSBcIkluZm9cIlxyXG5cclxuICBldmVudHM6XHJcbiAgICAkZS5tZXRhZGF0YS5ldmVudF90eXBlID0gXCJSRVNPVVJDRV9DUkVBVElPTlwiXHJcbiAgICAkZS5tZXRhZGF0YS52ZW5kb3JfbmFtZSA9IFwiR29vZ2xlIENsb3VkIFBsYXRmb3JtXCJcclxuICAgICRlLnRhcmdldC5yZXNvdXJjZS5yZXNvdXJjZV90eXBlID0gXCJWSVJUVUFMX01BQ0hJTkVcIlxyXG4gICAgJGUubWV0YWRhdGEucHJvZHVjdF9ldmVudF90eXBlID0gXC8uKmNvbXB1dGUuaW5zdGFuY2VzLmluc2VydFwvXHJcblxyXG4gICAgbm90ICRlLnRhcmdldC5yZXNvdXJjZS5uYW1lID0gXC9nazMuKlwvXHJcbiAgICBub3QgJGUudGFyZ2V0LnJlc291cmNlLm5hbWUgPSBcL2s4cy4qXC9cclxuICAgIG5vdCAkZS50YXJnZXQucmVzb3VyY2UubmFtZSA9IFwvZ2tlLipcL1xyXG5cclxuICBjb25kaXRpb246XHJcbiAgICAkZVxyXG59"
+	}
+}

@@ -1,0 +1,50 @@
+{
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "mitre_data": {
+            "type": "object",
+            "properties": {
+                "mitre_id": {
+                    "type": "string"
+                },
+                "tactic": {
+                    "type": "string"
+                },
+                "technique": {
+                    "type": "string"
+                },
+                "sub_technique": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "mitre_id",
+                "tactic"
+            ]
+        },
+        "detection": {
+            "type": "object",
+            "properties": {
+                "platform": {
+                    "type": "string"
+                },
+                "lang": {
+                    "type": "string"
+                },
+                "rule": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "rule"
+            ]
+        }
+    },
+    "required": [
+        "mitre_data",
+        "detection"
+    ]
+}
