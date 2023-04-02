@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Interactive Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Interactive Table</h1>
+      <div>{{ table }}</div>
+      <div>{{ out }}</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/ipywidgets.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+      IPython.Widgets.Manager().register_widgets();
+    </script>
