@@ -21,7 +21,6 @@ load_dotenv()
 # Flask App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
-# app.config['SECRET_KEY'] = "D4bB3XqtgQiU-BcwkvAbx0Efw_7ZH9qJ_HbRn_IhsU8msxVPGtNkeHWeIGoOtYQh"
 
 # Database
 client = pymongo.MongoClient('host.docker.internal', 27017)

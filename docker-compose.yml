@@ -9,11 +9,11 @@ services:
       dockerfile: ./flask_app/Dockerfile
     environment:
         JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-  
+
   nginx:
     container_name: nginx
     restart: always
-    build: 
+    build:
       context: ./
       dockerfile: ./nginx/Dockerfile
     ports:
