@@ -10,7 +10,7 @@ client = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client["users"]
 collection = db["detections"]
 
-# create a pandas dataframe with the table data
+# create a pandas dataframe with the table data.
 data = {'Tactic': ['Initial Access', 'Execution', 'Persistence'],
         'Technique': ['Spearphishing Attachment', 'Command and Scripting Interpreter', 'Create Account'],
         'Description': ['Phishing email with a malicious attachment is sent to the target', 'Adversary runs commands or scripts on the target system', 'Adversary creates a new user account with elevated privileges']}
