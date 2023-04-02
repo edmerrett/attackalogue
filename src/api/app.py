@@ -21,9 +21,10 @@ load_dotenv()
 # Flask App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+# app.config['SECRET_KEY'] = "D4bB3XqtgQiU-BcwkvAbx0Efw_7ZH9qJ_HbRn_IhsU8msxVPGtNkeHWeIGoOtYQh"
 
 # Database
-client = pymongo.MongoClient('localhost', 27017)
+client = pymongo.MongoClient('host.docker.internal', 27017)
 db = client.users
 schema = {
     "type": "object",
@@ -268,4 +269,4 @@ def update_detection(current_user):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='5000')
+    app.run(host='0.0.0.0', port='5000', debug=True)
