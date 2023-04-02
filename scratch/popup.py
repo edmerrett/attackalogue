@@ -16,7 +16,7 @@ data = {'Tactic': ['Initial Access', 'Execution', 'Persistence'],
         'Description': ['Phishing email with a malicious attachment is sent to the target', 'Adversary runs commands or scripts on the target system', 'Adversary creates a new user account with elevated privileges']}
 df = pd.DataFrame(data)
 
-# create a hover function to show a pop-up box with the description from MongoDB.
+# create a hover function to show a pop-up box with the description from MongoDB
 def show_description(row, col):
     technique = df.loc[row, 'Technique']
     description = collection.find_one({'technique': technique})['description']
