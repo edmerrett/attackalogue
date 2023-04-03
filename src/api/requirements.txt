@@ -1,7 +1,0 @@
-flask
-pymongo
-passlib
-uuid
-pyjwt
-flask-expects-json
-python-dotenv
