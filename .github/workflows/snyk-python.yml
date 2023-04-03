@@ -33,6 +33,6 @@ jobs:
       - uses: snyk/actions/setup@master
       - name: Test code with snyk
         run: |
-          snyk code test --severity-threshold="high|critical"
+          snyk code test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
