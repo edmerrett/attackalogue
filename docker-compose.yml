@@ -4,12 +4,18 @@ services:
   attack-api:
     container_name: attack-api
     restart: always
-    build: ./flask_app
-  
+    build:
+      context: ./
+      dockerfile: ./docker/flask_app/Dockerfile
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
   nginx:
     container_name: nginx
     restart: always
-    build: ./nginx
+    build:
+      context: ./
+      dockerfile: ./docker/nginx/Dockerfile
     ports:
       - "80:80"
     depends_on:

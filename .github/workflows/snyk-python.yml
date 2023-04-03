@@ -9,21 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - uses: snyk/actions/setup@master
-      - name: Install Python dependencies with Pip
-        working-directory: ./flask_app
-        run: pip3 install -r requirements.txt
       - name: Test dependencies with snyk
-        working-directory: ./flask_app
         run: |
           snyk test
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
       - name: Monitor dependencies for security issues with snyk
-        working-directory: ./flask_app
         run: |
           snyk monitor
         env:
@@ -32,12 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - uses: snyk/actions/setup@master
       - name: Test code with snyk
-        working-directory: ./flask_app
         run: |
           snyk code test
         env:
