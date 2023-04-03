@@ -11,19 +11,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.8.10
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
       - uses: snyk/actions/setup@master
-      - name: Install Python dependencies with Pip
-        working-directory: ./flask_app
-        run: pip3 install -r requirements.txt
       - name: Test dependencies with snyk
-        working-directory: ./flask_app
         run: |
           snyk test
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
       - name: Monitor dependencies for security issues with snyk
-        working-directory: ./flask_app
         run: |
           snyk monitor
         env:
@@ -35,9 +32,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
       - uses: snyk/actions/setup@master
       - name: Test code with snyk
-        working-directory: ./flask_app
         run: |
           snyk code test
         env:

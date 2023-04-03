@@ -6,16 +6,16 @@ services:
     restart: always
     build:
       context: ./
-      dockerfile: ./flask_app/Dockerfile
+      dockerfile: ./docker/flask_app/Dockerfile
     environment:
-        JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
   nginx:
     container_name: nginx
     restart: always
     build:
       context: ./
-      dockerfile: ./nginx/Dockerfile
+      dockerfile: ./docker/nginx/Dockerfile
     ports:
       - "80:80"
     depends_on:
